@@ -1,21 +1,24 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.lang.reflect.Array;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class SATsolver {
-    public SATsolver(String inputName) throws Exception {
+public class S {
+
+    public static Set<Integer> variables = new HashSet<>();
+    public S(String inputName) throws Exception {
         solve(inputName);
     }
 
     private void solve(final String inputName) throws Exception {
 
-        final List<Clause> clauses = new ArrayList<>();
+        final List<Clause1> clauses = new ArrayList<>();
         BufferedReader br = new BufferedReader(new FileReader(inputName));
         String line = br.readLine();
         while (line != null) {
             if (line.endsWith(" 0")) {
-                Clause clause = new Clause(line);
+                Clause1 clause = new Clause1(line);
                 clauses.add(clause);
             }
             line = br.readLine();
@@ -34,7 +37,7 @@ public class SATsolver {
         System.out.println("UNSAT");
     }
 
-    private void DPLL(List<Clause> clauses, Set<Integer> literals) {
+    private void DPLL(List<Clause1> clauses, Set<Integer> literals) {
 
         // Check if we have no more clauses that are unsatisfied:
         if (clauses.stream().allMatch(clause -> clause.clauseSatisfied)) {
@@ -68,9 +71,11 @@ public class SATsolver {
         }
 
         // Get all the unassignedLiterals from the alive clauses:
-        Set<Integer> unassignedLiterals = clauses.stream()
+
+        Set<Integer> unassignedLiterals = variables.stream().filter(p -> !newLiterals.contains(p) && !literals.contains(p)).collect(Collectors.toSet());
+                /*clauses.stream()
                 .filter(clause -> !clause.clauseSatisfied)
-                .flatMap(clause -> clause.unassignedLiterals.stream()).collect(Collectors.toSet());
+                .flatMap(clause -> clause.unassignedLiterals.stream()).collect(Collectors.toSet());*/
 
 
         if (unassignedLiterals.isEmpty()) {
@@ -98,64 +103,91 @@ public class SATsolver {
 
     }
 
-    private Set<Integer> findPureLiterals(List<Clause> clauses) {
+    private Set<Integer> findPureLiterals(List<Clause1> clauses) {
         Set<Integer> pureLiterals = new HashSet<>();
-        Set<Integer> allAliveLiterals = new HashSet<>();
-        for (Clause clause : clauses) {
-            if (!clause.clauseSatisfied) {
-                allAliveLiterals.addAll(clause.unassignedLiterals);
-            }
-        }
-        for (Integer literal : allAliveLiterals) {
-            if (!allAliveLiterals.contains(-literal)) {
+        for (int literal : variables) {
+            if (!variables.contains(-literal)) {
                 pureLiterals.add(literal);
             }
         }
         return pureLiterals;
     }
 
-    private void pureLiteralsProcess(List<Clause> clauses, Set<Integer> pureLiterals) {
+    private void pureLiteralsProcess(List<Clause1> clauses, Set<Integer> pureLiterals) {
         for (Integer literal : pureLiterals) {
-            for (Clause clause : clauses) {
-                if (clause.unassignedLiterals.contains(literal)) {
+            for (Clause1 clause : clauses) {
+                if (clause.positive[literal - 1] != null || clause.negative[literal - 1] != null) {
                     clause.clauseSatisfied = true;
                 }
             }
         }
     }
 
-
-    private void applyStep(final List<Clause> clauses, final Integer literal) {
-        for(Clause clause : clauses) {
-            if(!clause.clauseSatisfied) {
-                if(clause.unassignedLiterals.contains(literal)) {
+    private void applyStep(final List<Clause1> clauses, final int literal) {
+        boolean positiveN;
+        if (literal > 0){
+            positiveN = true;
+        } else positiveN = false;
+        if (positiveN) {
+            for(Clause1 clause : clauses) {
+                if(!clause.clauseSatisfied) {
+                    if(clause.positive[literal - 1] != null) {
+                        clause.clauseSatisfied = true;
+                    } else if(clause.negative[literal - 1] != null) {
+                        clause.negative[literal - 1] = "DEAD";
+                    }
+                }
+            }
+        }else {
+            for (Clause1 clause : clauses) {
+                if(clause.negative[literal - 1] != null) {
                     clause.clauseSatisfied = true;
-                } else if(clause.unassignedLiterals.contains(-literal)) {
-                    clause.unassignedLiterals.remove((Integer) (-literal));
-                    clause.deadLiterals.add(-literal);
+                } else if(clause.positive[literal - 1] != null) {
+                    clause.positive[literal - 1] = "DEAD";
                 }
             }
         }
     }
 
 
-    private void undoStep(final List<Clause> clauses, final Integer literal) {
-        for (Clause clause : clauses) {
-            if (clause.clauseSatisfied && clause.unassignedLiterals.contains(literal)) {
-                clause.clauseSatisfied = false;
+    private void undoStep(final List<Clause1> clauses, final int literal) {
+        boolean positiveN;
+        if (literal > 0){
+            positiveN = true;
+        } else positiveN = false;
+        if (positiveN) {
+            for (Clause1 clause : clauses) {
+                if (clause.clauseSatisfied && clause.positive[literal - 1] != null) {
+                    clause.clauseSatisfied = false;
+                }
+                if (clause.negative[literal - 1] == "DEAD") {
+                    clause.negative[literal - 1] = "UNSAT";
+                }
             }
-            if (clause.deadLiterals.contains(-literal)) {
-                clause.deadLiterals.remove((Integer) (-literal));
-                clause.unassignedLiterals.add(-literal);
+        }else {
+            for (Clause1 clause : clauses) {
+                if (clause.clauseSatisfied && clause.negative[literal - 1] != null) {
+                    clause.clauseSatisfied = false;
+                }
+                if (clause.positive[literal - 1] == "DEAD") {
+                    clause.positive[literal - 1] = "UNSAT";
+                }
             }
         }
     }
 
-    private Set<Integer> findUnitClauses(final List<Clause> clauses) {
+    private Set<Integer> findUnitClauses(final List<Clause1> clauses) {
         Set<Integer> unitPropagation = new HashSet<>();
-        for(Clause clause : clauses) {
+        for(Clause1 clause : clauses) {
             if(clause.isUnitClause()) {
-                unitPropagation.add(clause.unassignedLiterals.get(0));
+                for (int i = 0; i < clause.positive.length; i++){
+                    if (clause.positive[i] == "UNSAT")
+                        unitPropagation.add(i + 1);
+                }
+                for (int i = 0; i < clause.negative.length; i++){
+                    if (clause.negative[i] == "UNSAT")
+                        unitPropagation.add(-i - 1);
+                }
             }
         }
         return unitPropagation;
@@ -170,19 +202,26 @@ public class SATsolver {
         System.exit(1);
     }
 
-
-        public static class Clause {
-        private List<Integer> unassignedLiterals = new ArrayList<>();
-        private List<Integer> deadLiterals = new ArrayList<>();
+    public static class Clause1 {
+        private String[] positive;
+        private String[] negative;
         private boolean clauseSatisfied = false;
-        private Clause(String inputLine) {
+        private int numberOfLiterals = 0;
+        private Clause1(String inputLine) {
             String[] line = inputLine.substring(0, inputLine.length() - 2).split("\\s");
             for (String literal : line) {
-                unassignedLiterals.add(Integer.parseInt(literal));
+                int num = Integer.parseInt(literal);
+                variables.add(num);
+                numberOfLiterals++;
+                if (num > 0) {
+                    positive[numberOfLiterals] = "UNSAT";
+                } else {
+                    negative[numberOfLiterals] = "UNSAT";
+                }
             }
         }
         boolean isUnitClause() {
-            return !clauseSatisfied && unassignedLiterals.size() == 1;
+            return !clauseSatisfied && numberOfLiterals == 1;
         }
     }
 }
