@@ -1,5 +1,5 @@
 c A sample .txt file.
-p cnf 4934 718
+p cnf 718 4934
 -1 -2 3 0
 -1 -4 5 0
 -1 -6 7 0

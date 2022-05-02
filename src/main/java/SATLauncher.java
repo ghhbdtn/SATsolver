@@ -9,7 +9,7 @@ public class SATLauncher {
     public static void main(String[] args) throws Exception {
         startTime = System.currentTimeMillis();
         //new SATLauncher().launch(args);
-        S solver = new S("src/nputtest6.txt");
+        int[] solver = new SATsolver("src/input/inputtest6.txt").solve();
     }
 
     public void launch(String[] args) throws Exception {
