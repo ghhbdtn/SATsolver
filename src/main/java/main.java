@@ -1,11 +1,6 @@
-
-import org.kohsuke.args4j.Argument;
-import org.kohsuke.args4j.CmdLineException;
-import org.kohsuke.args4j.CmdLineParser;
 import org.sat4j.core.VecInt;
 import org.sat4j.minisat.SolverFactory;
 import org.sat4j.reader.DimacsReader;
-import org.sat4j.reader.ParseFormatException;
 import org.sat4j.reader.Reader;
 import org.sat4j.specs.*;
 
@@ -13,7 +8,6 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 
 public class main {
     public static void main(String[] args) throws Exception {
@@ -49,14 +43,14 @@ public class main {
         }
         System.out.println(cl);
        System.out.println(problem.isSatisfiable(new VecInt(solution)));
-//            if (problem.isSatisfiable()) {
-//                System.out.println("Satisfiable !");
-//                for (int i = 0; i < problem.model().length; i++){
-//                    System.out.println(problem.model()[i] + " ");
-//                }
-////                reader.decode(problem.model(),out);
-//            } else {
-//                System.out.println("Unsatisfiable !");
-//            }
+            if (problem.isSatisfiable()) {
+                System.out.println("Satisfiable !");
+                for (int i = 0; i < problem.model().length; i++){
+                    System.out.println(problem.model()[i] + " ");
+                }
+
+            } else {
+                System.out.println("Unsatisfiable !");
+            }
     }
 }

@@ -24,6 +24,6 @@ public class SATLauncher {
             return;
         }
 
-        SATsolver solver = new SATsolver(inputName);
+        int[] solver = new SATsolver(inputName).solve();
     }
 }
