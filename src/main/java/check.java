@@ -9,7 +9,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class main {
+public class check {
+    //для полной проверки солвера, с выводом модели другого солвера + вывод неразрешенных клозов, если таковые есть
     public static void main(String[] args) throws Exception {
         ISolver solver = SolverFactory.newDefault();
         solver.setTimeout(3600); // 1 hour timeout
@@ -17,7 +18,6 @@ public class main {
         String path = args[0];
         SATsolver saTsolver = new SATsolver(path);
         int[] solution = saTsolver.solve();
-        // CNF filename is given on the command line
        IProblem problem = reader.parseInstance(path);
 
         BufferedReader br = new BufferedReader(new FileReader(path));

@@ -5,11 +5,9 @@ import org.kohsuke.args4j.CmdLineParser;
 public class SATLauncher {
     @Argument(required = true, usage = "InputName")
     private String inputName;
-    public static long startTime;
+
     public static void main(String[] args) throws Exception {
-        startTime = System.currentTimeMillis();
-        //new SATLauncher().launch(args);
-        int[] solver = new SATsolver("src/input/inputtest6.txt").solve();
+        new SATLauncher().launch(args);
     }
 
     public void launch(String[] args) throws Exception {
