@@ -2,6 +2,8 @@ import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 
+import java.util.Arrays;
+
 public class SATLauncher {
     @Argument(required = true, usage = "InputName")
     private String inputName;
@@ -22,6 +24,13 @@ public class SATLauncher {
             return;
         }
 
-        int[] solver = new SATsolver(inputName).solve();
+        int[] solution = new SATsolver(inputName).solve();
+
+        if (solution.length != 0) {
+            System.out.println("SAT");
+            System.out.println(Arrays.toString(solution));
+        } else {
+            System.out.println("UNSAT");
+        }
     }
 }
