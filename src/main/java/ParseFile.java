@@ -24,6 +24,16 @@ public class ParseFile {
         }
     }
 
+
+
+
+
+
+
+
+
+    
+
     public List<SATsolver.Clause> getClauses() {
         return clauses;
     }
