@@ -4,8 +4,8 @@ import java.util.*;
 import java.util.stream.Stream;
 
 public class ParseFile {
-    Collection<SATsolver.Clause> clauses;
-    Map<Integer, Integer> watch;
+    List<SATsolver.Clause> clauses;
+    Map<Integer, List<SATsolver.Clause>> watch;
 
     public ParseFile(String inputName) throws Exception {
         clauses = new ArrayList<>();
@@ -24,11 +24,11 @@ public class ParseFile {
         }
     }
 
-    public Collection<SATsolver.Clause> getClauses() {
+    public List<SATsolver.Clause> getClauses() {
         return clauses;
     }
 
-    public Map<Integer, Integer> getWatch() {
+    public Map<Integer, List<SATsolver.Clause>> getWatch() {
         return watch;
     }
 }
